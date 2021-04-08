@@ -50,12 +50,15 @@ namespace ProcessDependencyGraph
                 else
                 {
                     // Otherwise this project would remain untouched by changes
-                    sb.AppendLine($"\"{kvp.Key}\" [fontname=\"consolas\", fontcolor=black]");
+                    // sb.AppendLine($"\"{kvp.Key}\" [fontname=\"consolas\", fontcolor=black]");
                 }
 
                 foreach (string dependency in kvp.Value)
                 {
-                    sb.AppendLine($"\"{kvp.Key}\" -> \"{dependency}\"");
+                    if (targetProject.Equals(kvp.Key) || affectedProjects.Contains(kvp.Key))
+                    {
+                        sb.AppendLine($"\"{kvp.Key}\" -> \"{dependency}\"");
+                    }
                 }
             }
 
