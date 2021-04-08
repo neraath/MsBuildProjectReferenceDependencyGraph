@@ -50,12 +50,16 @@ namespace ProcessDependencyGraph
                 else
                 {
                     // Otherwise this project is unrelated to this
-                    sb.AppendLine($"\"{kvp.Key}\" [fontname=\"consolas\", fontcolor=black]");
+                    //sb.AppendLine($"\"{kvp.Key}\" [fontname=\"consolas\", fontcolor=black]");
                 }
 
-                foreach (string dependency in kvp.Value)
+                if (targetProject.Equals(kvp.Key) || directNOrderDependencies.Contains(kvp.Key))
                 {
-                    sb.AppendLine($"\"{kvp.Key}\" -> \"{dependency}\"");
+                    foreach (string dependency in kvp.Value)
+                    {
+
+                        sb.AppendLine($"\"{kvp.Key}\" -> \"{dependency}\"");
+                    }
                 }
             }
 
