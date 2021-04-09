@@ -6,6 +6,7 @@
 
 namespace ProcessParallelAbility.Tests
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using NUnit.Framework;
@@ -17,7 +18,7 @@ namespace ProcessParallelAbility.Tests
         [TestCaseSource(typeof(ResolveParallelTreeTests))]
         public void ResolveParallelTree(IDictionary<string, SortedSet<string>> dependencyTree, IDictionary<string, int> expected)
         {
-            IDictionary<string, int> actual = ParallelAbility.ResolveParallelTree(dependencyTree);
+            IDictionary<string, UInt64> actual = ParallelAbility.ResolveParallelTree(dependencyTree);
 
             Assert.That(actual, Is.EquivalentTo(expected));
         }

@@ -17,11 +17,11 @@ namespace ProcessParallelAbility
         /// </summary>
         /// <param name="parallelTree">The structure returned by <see cref="ResolveParallelTree(IDictionary{string, SortedSet{string}})"/>.</param>
         /// <returns>A structure in which the Key is the "Level" or depth of the project and the Value is the list of projects at that level.</returns>
-        internal static IDictionary<int, List<string>> ConvertParallelTreeToLevels(IDictionary<string, int> parallelTree)
+        internal static IDictionary<UInt64, List<string>> ConvertParallelTreeToLevels(IDictionary<string, UInt64> parallelTree)
         {
-            IDictionary<int, List<string>> levels = new Dictionary<int, List<string>>();
+            IDictionary<UInt64, List<string>> levels = new Dictionary<UInt64, List<string>>();
 
-            foreach (KeyValuePair<string, int> entry in parallelTree)
+            foreach (KeyValuePair<string, UInt64> entry in parallelTree)
             {
                 if (!levels.ContainsKey(entry.Value))
                 {
@@ -39,9 +39,9 @@ namespace ProcessParallelAbility
         /// </summary>
         /// <param name="dependencyTree">The dependency tree to evaluate.</param>
         /// <returns>A structure in which the Key is the project and the value is the depth within the given dependency tree.</returns>
-        internal static IDictionary<string, int> ResolveParallelTree(IDictionary<string, SortedSet<string>> dependencyTree)
+        internal static IDictionary<string, UInt64> ResolveParallelTree(IDictionary<string, SortedSet<string>> dependencyTree)
         {
-            IDictionary<string, int> parallelBuildTree = new Dictionary<string, int>(StringComparer.InvariantCultureIgnoreCase);
+            IDictionary<string, UInt64> parallelBuildTree = new Dictionary<string, UInt64>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (KeyValuePair<string, SortedSet<string>> dotGraphEntry in dependencyTree)
             {
@@ -88,7 +88,7 @@ namespace ProcessParallelAbility
                                     else
                                     {
                                         // Otherwise we need to find out what the deepest dependency is, and go one level deeper
-                                        int deepestDependency = dependencyTree[currentProjectName].Select(dependency => parallelBuildTree[dependency]).Max();
+                                        UInt64 deepestDependency = dependencyTree[currentProjectName].Select(dependency => parallelBuildTree[dependency]).Max();
                                         parallelBuildTree.Add(currentProjectName, deepestDependency + 1);
                                     }
                                 }
