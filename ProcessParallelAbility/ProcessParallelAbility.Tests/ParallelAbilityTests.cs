@@ -28,6 +28,33 @@ namespace ProcessParallelAbility.Tests
     {
         public IEnumerator GetEnumerator()
         {
+            yield return new TestCaseData(
+                new Dictionary<string, SortedSet<string>>(StringComparer.InvariantCultureIgnoreCase)
+                {
+                    // This is the tree
+                    // digraph {
+                    // A -> B
+                    // b -> c
+                    // b -> d
+                    // c -> d
+                    // D -> e
+                    // e -> a
+                    // }
+                    { "A", new SortedSet<string>() {"B"} },
+                    { "B", new SortedSet<string>() {"c", "d"} },
+                    { "C", new SortedSet<string>() {"d"} },
+                    { "D", new SortedSet<string>() {"e"} },
+                    { "e", new SortedSet<string>() {"a"} }
+                },
+                new Dictionary<string, int>
+                {
+                    { "A", 4 },
+                    { "B", 3 },
+                    { "c", 2 },
+                    { "d", 1 },
+                    { "e", 0 }
+                }
+                ).SetName("{m}ComplexCircularDependency");
             yield return new TestCaseData
                 (
                 new Dictionary<string, SortedSet<string>>()
