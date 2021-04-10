@@ -9,7 +9,6 @@ namespace ProcessParallelAbility
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
 
     internal static class ParallelAbility
     {
@@ -44,61 +43,64 @@ namespace ProcessParallelAbility
         {
             IDictionary<string, UInt64> parallelBuildTree = new Dictionary<string, UInt64>(StringComparer.InvariantCultureIgnoreCase);
 
-            Parallel.ForEach(source: dependencyTree, (dotGraphEntry) =>
+            foreach (KeyValuePair<string, SortedSet<string>> dotGraphEntry in dependencyTree)
             {
-                if (parallelBuildTree.ContainsKey(dotGraphEntry.Key)) return;
-
-                Stack<string> projectsToResolve = new Stack<string>();
-                projectsToResolve.Push(dotGraphEntry.Key);
-
-                while (projectsToResolve.Count != 0)
+                if (parallelBuildTree.ContainsKey(dotGraphEntry.Key))
                 {
-                    string currentProjectName = projectsToResolve.Pop();
-                    if (parallelBuildTree.ContainsKey(currentProjectName)) continue;
+                    // We can Skip this because it was resolved
+                }
+                else
+                {
+                    // Push all of the projects as well as ourself
+                    Stack<string> projectsToResolve = new Stack<string>(dotGraphEntry.Value);
+                    projectsToResolve.Push(dotGraphEntry.Key);
 
-                    try
+                    while (projectsToResolve.Count != 0)
                     {
-                        string[] unresolvedDependencies = null;
-                        unresolvedDependencies = dependencyTree[currentProjectName]
-                            .Where(dependency => !parallelBuildTree.ContainsKey(dependency)).ToArray();
-
-                        if (unresolvedDependencies.Any())
+                        string currentProjectName = projectsToResolve.Pop();
+                        if (parallelBuildTree.ContainsKey(currentProjectName))
                         {
-                            // We still need to resolve more N-Order Dependencies
-                            projectsToResolve.Push(currentProjectName);
-                            foreach (string dependency in unresolvedDependencies)
-                            {
-                                projectsToResolve.Push(dependency);
-                            }
+                            // Skip it because it is resolved
                         }
                         else
                         {
-                            lock (parallelBuildTree)
+                            try
                             {
-                                if (parallelBuildTree.ContainsKey(currentProjectName)) continue;
+                                string[] unresolvedDependencies = dependencyTree[currentProjectName].Where(dependency => !parallelBuildTree.ContainsKey(dependency)).ToArray();
 
-                                // Everything was resolved now we need to figure out at what level we should insert
-                                if (dependencyTree[currentProjectName].Count == 0)
+                                if (unresolvedDependencies.Any())
                                 {
-                                    // If we do not have any dependencies we're the deepest project
-                                    parallelBuildTree.Add(currentProjectName, 0);
+                                    // We still need to resolve more N-Order Dependencies
+                                    projectsToResolve.Push(currentProjectName);
+                                    foreach (string dependency in unresolvedDependencies)
+                                    {
+                                        projectsToResolve.Push(dependency);
+                                    }
                                 }
                                 else
                                 {
-                                    // Otherwise we need to find out what the deepest dependency is, and go one level deeper
-                                    UInt64 deepestDependency = dependencyTree[currentProjectName]
-                                        .Select(dependency => parallelBuildTree[dependency]).Max();
-                                    parallelBuildTree.Add(currentProjectName, deepestDependency + 1);
+                                    // Everything was resolved now we need to figure out at what level we should insert
+                                    if (dependencyTree[currentProjectName].Count == 0)
+                                    {
+                                        // If we do not have any dependencies we're the deepest project
+                                        parallelBuildTree.Add(currentProjectName, 0);
+                                    }
+                                    else
+                                    {
+                                        // Otherwise we need to find out what the deepest dependency is, and go one level deeper
+                                        UInt64 deepestDependency = dependencyTree[currentProjectName].Select(dependency => parallelBuildTree[dependency]).Max();
+                                        parallelBuildTree.Add(currentProjectName, deepestDependency + 1);
+                                    }
                                 }
+                            }
+                            catch
+                            {
+                                throw;
                             }
                         }
                     }
-                    catch
-                    {
-                        throw;
-                    }
                 }
-            });
+            }
 
             return parallelBuildTree;
         }
