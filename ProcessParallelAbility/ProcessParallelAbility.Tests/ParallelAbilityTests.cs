@@ -34,6 +34,55 @@ namespace ProcessParallelAbility.Tests
                     // This is the tree
                     // digraph {
                     // A -> B
+                    // A -> C
+                    // A -> K
+                    // B -> D
+                    // B -> E
+                    // D -> E
+                    // D -> H
+                    // E -> H
+                    // C -> E
+                    // C -> F
+                    // C -> G
+                    // G -> E
+                    // G -> J
+                    // G -> K
+                    // H -> I
+                    // I -> G
+                    // }
+                    { "A", new SortedSet<string>() {"B", "C", "K"} },
+                    { "B", new SortedSet<string>() {"D", "E"} },
+                    { "C", new SortedSet<string>() {"E", "F", "G"} },
+                    { "D", new SortedSet<string>() {"E", "H"} },
+                    { "E", new SortedSet<string>() {"H"} },
+                    { "F", new SortedSet<string>() {} },
+                    { "G", new SortedSet<string>() {"E", "J", "K"} },
+                    { "H", new SortedSet<string>() {"I"} },
+                    { "I", new SortedSet<string>() {"G"} },
+                    { "J", new SortedSet<string>() },
+                    { "K", new SortedSet<string>() }
+                },
+                new Dictionary<string, int>
+                {
+                    { "A", 6 },
+                    { "B", 5 },
+                    { "C", 4 },
+                    { "D", 4 },
+                    { "E", 3 },
+                    { "F", 0 },
+                    { "G", 0 },
+                    { "H", 2 },
+                    { "I", 1 },
+                    { "J", 0 },
+                    { "K", 0 }
+                }
+            ).SetName("{m}ComplexMultiCircularDependency");
+            yield return new TestCaseData(
+                new Dictionary<string, SortedSet<string>>(StringComparer.InvariantCultureIgnoreCase)
+                {
+                    // This is the tree
+                    // digraph {
+                    // A -> B
                     // B -> C
                     // B -> D
                     // D -> E

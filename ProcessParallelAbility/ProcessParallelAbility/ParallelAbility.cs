@@ -44,7 +44,7 @@ namespace ProcessParallelAbility
             IDictionary<string, UInt64> parallelBuildTree = new Dictionary<string, UInt64>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (KeyValuePair<string, SortedSet<string>> dotGraphEntry in dependencyTree)
-            {
+            { 
                 if (parallelBuildTree.ContainsKey(dotGraphEntry.Key))
                 {
                     // We can Skip this because it was resolved
